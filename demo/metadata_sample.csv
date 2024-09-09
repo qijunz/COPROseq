@@ -1,0 +1,8 @@
+﻿sample_id,r1_file,r2_file
+EPB1,/Volumes/ReyLab_QZ10T/COPROseq/data_20240830/EPB1_S26_R1_001.fastq.gz,/Volumes/ReyLab_QZ10T/COPROseq/data_20240830/EPB1_S26_R2_001.fastq.gz
+EPB2,/Volumes/ReyLab_QZ10T/COPROseq/data_20240830/EPB2_S27_R1_001.fastq.gz,/Volumes/ReyLab_QZ10T/COPROseq/data_20240830/EPB2_S27_R2_001.fastq.gz
+EPB3,/Volumes/ReyLab_QZ10T/COPROseq/data_20240830/EPB3_S28_R1_001.fastq.gz,/Volumes/ReyLab_QZ10T/COPROseq/data_20240830/EPB3_S28_R2_001.fastq.gz
+EPB4,/Volumes/ReyLab_QZ10T/COPROseq/data_20240830/EPB4_S29_R1_001.fastq.gz,/Volumes/ReyLab_QZ10T/COPROseq/data_20240830/EPB4_S29_R2_001.fastq.gz
+EPB5,/Volumes/ReyLab_QZ10T/COPROseq/data_20240830/EPB5_S30_R1_001.fastq.gz,/Volumes/ReyLab_QZ10T/COPROseq/data_20240830/EPB5_S30_R2_001.fastq.gz
+EPB6,/Volumes/ReyLab_QZ10T/COPROseq/data_20240830/EPB6_S31_R1_001.fastq.gz,/Volumes/ReyLab_QZ10T/COPROseq/data_20240830/EPB6_S31_R2_001.fastq.gz
+EPB7,/Volumes/ReyLab_QZ10T/COPROseq/data_20240830/EPB7_S32_R1_001.fastq.gz,/Volumes/ReyLab_QZ10T/COPROseq/data_20240830/EPB7_S32_R2_001.fastq.gz
