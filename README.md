@@ -10,7 +10,7 @@ The pipeline was written using Python but requires additional dependencies.
 ### Dependencies
 1. Download the source from GitHub repo: [COPROseq-master.zip](https://github.com/qijunz/COPROseq/archive/refs/heads/master.zip).
 2. Decompress the source and make sure the main scrip `run_coproseq.py` is in your working directory.
-3. Download and install [trimmomatic](http://www.usadellab.org/cms/index.php?page=trimmomatic). If you download binary, make sure file `trimmomatic-0.39.jar` is in your `PATH`.
+3. Download and install [trimmomatic](http://www.usadellab.org/cms/index.php?page=trimmomatic). If you download binary, make sure file `trimmomatic-0.39.jar` is in your `PATH`, in some cases this doesn't work, alternatively you can specify `trimmomatic-0.39.jar` file path in `-t`/`--trimmomatic_directory` argument.
 4. Download and install [Java](https://www.java.com/en/download/help/download_options.html) which is required to run trimmomatic.
 5. Download and install [kallisto](https://pachterlab.github.io/kallisto/download).
 
@@ -34,7 +34,7 @@ This pipeline requires two metadata files.
 ### Run script
 One example to run:
 ```bash
-$ python run_coproseq.py -d COPROseq/data_20240830 -r genome -s metadata_sample.csv -g metadata_genome.csv -o coproseq_out -p 8
+$ python run_coproseq.py -d COPROseq/data_20240830 -r genome -s metadata_sample.csv -g metadata_genome.csv -t bin/trimmomatic-0.39.jar -o coproseq_out -p 8
 ```
 
 You can check details of arguments by
@@ -48,7 +48,7 @@ to get
 usage: run_coproseq.py [-h] [-d DATA_DIRECTORY]
                        [-r GENOME_REFERENCE_DIRECTORY] [-s SAMPLE_METADATA]
                        [-g GENOME_METADATA] [-o OUTPUT_DIRECTORY]
-                       [-p PROCESSORS]
+                       [-t TRIMMOMATIC_DIRECTORY] [-p PROCESSORS]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -62,6 +62,8 @@ optional arguments:
                         reference genome .csv file
   -o OUTPUT_DIRECTORY, --output_directory OUTPUT_DIRECTORY
                         output directory
+  -t TRIMMOMATIC_DIRECTORY, --trimmomatic_directory TRIMMOMATIC_DIRECTORY
+                        the directory path for trimmomatic-0.39.jar
   -p PROCESSORS, --processors PROCESSORS
                         Number of CPU
 ```
