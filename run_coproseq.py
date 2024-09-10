@@ -7,7 +7,7 @@
 #   3. Generate reads count and relative abundance table
 
 # EXAMPLE:
-# python run_coproseq.py -d /Volumes/ReyLab_QZ10T/COPROseq/data_20240830 -r genome -s metadata_sample.csv -g metadata_genome.csv -o coproseq_out -p 8
+# python run_coproseq.py -d /Volumes/ReyLab_QZ10T/COPROseq/data_20240830 -r genome -s metadata_sample.csv -g metadata_genome.csv -t /Users/rootqz/bin/trimmomatic-0.39.jar -o coproseq_out -p 8
 
 
 import os
@@ -38,7 +38,7 @@ def run_command(command_string, stdout_path = None):
 
 
 
-def run_trimmomatic(data_path, meta_sample, num_processors=4):
+def run_trimmomatic(data_path, meta_sample, trimmomatic_path, num_processors=4):
     
     # Given raw sequencing read fastq files
     # DO: remove low quality and unpaired reads, trimmed reads in new fastq files
@@ -54,14 +54,14 @@ def run_trimmomatic(data_path, meta_sample, num_processors=4):
         if os.path.isfile(r1_file) and os.path.isfile(r2_file):
             
             # run Trimmomatic
-            run_command('java -jar /Users/rootqz/bin/trimmomatic-0.39.jar PE -threads {} \
+            run_command('java -jar {} PE -threads {} \
                                     {} \
                                     {} \
                                     {}/{}_R1_trimmed_paired.fastq \
                                     {}/{}_R1_trimmed_unpaired.fastq \
                                     {}/{}_R2_trimmed_paired.fastq \
                                     {}/{}_R2_trimmed_unpaired.fastq \
-                                    SLIDINGWINDOW:4:20 MINLEN:50'.format(num_processors, r1_file, r2_file, data_path, sample_id, data_path, sample_id, data_path, sample_id, data_path, sample_id))
+                                    SLIDINGWINDOW:4:20 MINLEN:50'.format(trimmomatic_path, num_processors, r1_file, r2_file, data_path, sample_id, data_path, sample_id, data_path, sample_id, data_path, sample_id))
             
 
 def rename_genome(genome_path, meta_genome):
@@ -177,6 +177,7 @@ def main(args):
     genome_path = args.genome_reference_directory
     meta_sample_file = args.sample_metadata
     meta_genome_file = args.genome_metadata
+    trimmomatic_path = args.trimmomatic_directory
     out_path = args.output_directory
     num_processors = args.processors
 
@@ -196,7 +197,7 @@ def main(args):
 
         # trim raw reads
         print('[{}] Start to trim raw reads using trimmomatic'.format(datetime.datetime.now()), file=log_file)
-        run_trimmomatic(data_path, meta_sample, num_processors)
+        run_trimmomatic(data_path, meta_sample, trimmomatic_path, num_processors)
         print('[{}] Reads trimming done'.format(datetime.datetime.now()), file=log_file)
 
         # rename and merge reference genome fna files
@@ -249,6 +250,10 @@ if __name__ == "__main__":
                         default='')
     parser.add_argument('-o', '--output_directory',
                         help='output directory',
+                        type=str,
+                        default='')
+    parser.add_argument('-t', '--trimmomatic_directory',
+                        help='the directory path for trimmomatic-0.39.jar',
                         type=str,
                         default='')
     parser.add_argument('-p', '--processors',
