@@ -28,8 +28,8 @@ This pipeline requires two metadata files.
 ## How to run
 
 ### Input files
-1. All sequencing fastq files should be in same directory, which will be specified in `-d`/`--data_directory` argument.
-2. All genome fna files (downloaded from NCBI refseq) should be in same directory, which will be specified in `-r`/`--genome_reference_directory` argument.
+1. All sequencing fastq files should be in same directory, which will be specified in `-d`/`--data_directory` argument. One example of sequencing files can be downloaded from [demo/data/](https://uwmadison.box.com/s/aiqp2utkqu9p9ydqbm8z3knjqhhh7dq8).
+2. All genome fna files (downloaded from NCBI refseq) should be in same directory, which will be specified in `-r`/`--genome_reference_directory` argument. One example of genome files can be downloaded from [demo/genome/](https://uwmadison.box.com/s/ie7qhxt4eibgbuglyu3omjibjose1h13).
 
 ### Run script
 One example to run:
