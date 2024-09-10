@@ -19,28 +19,11 @@ This pipeline requires two metadata files.
 
 1. Sample metadata file.
 - This `.csv` file should include your sample metadata information. 
-- First column is your sample ID, 2nd and 3rd is the absolute path of raw sequencing reads fastq file. For example, in `demo/metadata_sample.csv`
-
-| sample_id  | r1_file | r2_file |
-| ------------- | ------------- | ------------- |
-| EPB1  | COPROseq/data/EPB1_S26_R1_001.fastq.gz  | COPROseq/data/EPB1_S26_R2_001.fastq.gz  |
-| EPB2  | COPROseq/data/EPB2_S27_R1_001.fastq.gz  | COPROseq/data/EPB2_S27_R2_001.fastq.gz  |
-| EPB3  | COPROseq/data/EPB3_S28_R1_001.fastq.gz  | COPROseq/data/EPB3_S28_R2_001.fastq.gz  |
-| EPB4  | COPROseq/data/EPB4_S29_R1_001.fastq.gz  | COPROseq/data/EPB4_S29_R2_001.fastq.gz  |
+- First column is your sample ID, 2nd and 3rd is the absolute path of raw sequencing reads fastq file. One example is shown in `demo/metadata_sample.csv`
 
 2. Reference genome metadata file.
 - This `.csv` file should include your reference genome metadata information. The COPROseq is the analysis to map seuqnecing reads to bacteria genomes from a defined community. The whole genome sequencing should be available. 
-- First column is genome ID, which will be used for downstream analysis, you can customize genome_id using your preference. 2nd is the RefSeq ID of assembly from NCBI. Usually refseq genome ID start with `GCF`. Check these IDs and make sure they are the same to `.fna` files in genome reference directory. For example, in `demo/metadata_genome.csv`
-
-| genome_id  | ncbi_gcf_id |
-| ------------- | ------------- |
-| Bacteroides_caccae_ATCC_43185  | GCF_000169015.1_ASM16901v1  |
-| Bacteroides_ovatus_ATCC_8483  | GCF_000154125.1_ASM15412v1  |
-| Bacteroides_thetaiotaomicron_VPI_5482  | GCF_000011065.1_ASM1106v1  |
-| Collinsella_aerofaciens_ATCC_25986  | GCF_010509075.1_ASM1050907v1  |
-| Agathobacter_rectalis_ATCC_33656  | GCF_000020605.1_ASM2060v1  |
-| Escherichia_coli_MS200_1  | GCF_000164535.1_ASM16453v1  |
-
+- First column is genome ID, which will be used for downstream analysis, you can customize genome_id using your preference. 2nd is the RefSeq ID of assembly from NCBI. Usually refseq genome ID start with `GCF`. Check these IDs and make sure they are the same to `.fna` files in genome reference directory. One example is shown in `demo/metadata_genome.csv`
 
 ## How to run
 
