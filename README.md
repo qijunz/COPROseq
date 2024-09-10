@@ -21,12 +21,6 @@ This pipeline requires two metadata files.
 - This `.csv` file should include your sample metadata information. 
 - First column is your sample ID, 2nd and 3rd is the absolute path of raw sequencing reads fastq file. For example, in `demo/metadata_sample.csv`
 
-<style scoped>
-table {
-  font-size: 13px;
-}
-</style>
-
 | sample_id  | r1_file | r2_file |
 | ------------- | ------------- | ------------- |
 | EPB1  | COPROseq/data/EPB1_S26_R1_001.fastq.gz  | COPROseq/data/EPB1_S26_R2_001.fastq.gz  |
