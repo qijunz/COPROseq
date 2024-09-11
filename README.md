@@ -26,18 +26,18 @@ This pipeline requires two metadata files.
 
 1. Sample metadata file.
 - This `.csv` file should include your sample metadata information. 
-- First column is your sample ID, 2nd and 3rd is the absolute path of raw sequencing reads fastq file. One example is shown in `demo/metadata_sample.csv`
+- First column is your sample ID, 2nd and 3rd is the absolute path of raw sequencing reads fastq file. One example is shown in `test/metadata_sample.csv`
 
 2. Reference genome metadata file.
 - This `.csv` file should include your reference genome metadata information. The COPROseq is the analysis to map seuqnecing reads to bacteria genomes from a defined community. The whole genome sequencing should be available. 
-- First column is genome ID, which will be used for downstream analysis, you can customize genome_id using your preference. 2nd is the RefSeq ID of assembly from NCBI. Usually refseq genome ID start with `GCF`. Check these IDs and make sure they are the same to `.fna` files in genome reference directory. One example is shown in `demo/metadata_genome.csv`
+- First column is genome ID, which will be used for downstream analysis, you can customize genome_id using your preference. 2nd is the RefSeq ID of assembly from NCBI. Usually refseq genome ID start with `GCF`. Check these IDs and make sure they are the same to `.fna` files in genome reference directory. One example is shown in `test/metadata_genome.csv`
 
 
 ## How to run
 
 ### Input files
-1. All sequencing fastq files should be in same directory, which will be specified in `-d`/`--data_directory` argument. One example of sequencing files can be downloaded from [demo/data/](https://uwmadison.box.com/s/aiqp2utkqu9p9ydqbm8z3knjqhhh7dq8).
-2. All genome fna files (downloaded from NCBI refseq) should be in same directory, which will be specified in `-r`/`--genome_reference_directory` argument. One example of genome files can be downloaded from [demo/genome/](https://uwmadison.box.com/s/ie7qhxt4eibgbuglyu3omjibjose1h13).
+1. All sequencing fastq files should be in same directory, which will be specified in `-d`/`--data_directory` argument. One example of sequencing files can be downloaded from [test/data/](https://uwmadison.box.com/s/aiqp2utkqu9p9ydqbm8z3knjqhhh7dq8).
+2. All genome fna files (downloaded from NCBI refseq) should be in same directory, which will be specified in `-r`/`--genome_reference_directory` argument. One example of genome files can be downloaded from [test/genome/](https://uwmadison.box.com/s/ie7qhxt4eibgbuglyu3omjibjose1h13).
 
 ### Run script
 One example to run:
