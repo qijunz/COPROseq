@@ -7,7 +7,7 @@
 #   3. Generate reads count and relative abundance table
 
 # EXAMPLE:
-# python run_coproseq.py -d /Volumes/ReyLab_QZ10T/COPROseq/data_20240830 -r genome -s metadata_sample.csv -g metadata_genome.csv -t /Users/rootqz/bin/trimmomatic-0.39.jar -o coproseq_out -p 8
+# python run_coproseq.py -r genome -s metadata_sample.csv -g metadata_genome.csv -u /Volumes/ReyLab_QZ10T/COPROseq/util -o coproseq_out -p 8
 
 
 import os
@@ -38,7 +38,7 @@ def run_command(command_string, stdout_path = None):
 
 
 
-def run_trimmomatic(data_path, meta_sample, trimmomatic_path, num_processors=4):
+def run_trimmomatic(meta_sample, utility_path, num_processors=4):
     
     # Given raw sequencing read fastq files
     # DO: remove low quality and unpaired reads, trimmed reads in new fastq files
@@ -54,15 +54,62 @@ def run_trimmomatic(data_path, meta_sample, trimmomatic_path, num_processors=4):
         if os.path.isfile(r1_file) and os.path.isfile(r2_file):
             
             # run Trimmomatic
-            run_command('java -jar {} PE -threads {} \
+            run_command('java -jar {}/trimmomatic-0.39.jar PE -threads {} \
                                     {} \
                                     {} \
-                                    {}/{}_R1_trimmed_paired.fastq \
-                                    {}/{}_R1_trimmed_unpaired.fastq \
-                                    {}/{}_R2_trimmed_paired.fastq \
-                                    {}/{}_R2_trimmed_unpaired.fastq \
-                                    SLIDINGWINDOW:4:20 MINLEN:50'.format(trimmomatic_path, num_processors, r1_file, r2_file, data_path, sample_id, data_path, sample_id, data_path, sample_id, data_path, sample_id))
+                                    tmp/{}_R1_trimmed_paired.fastq \
+                                    tmp/{}_R1_trimmed_unpaired.fastq \
+                                    tmp/{}_R2_trimmed_paired.fastq \
+                                    tmp/{}_R2_trimmed_unpaired.fastq \
+                                    SLIDINGWINDOW:4:20 MINLEN:50'.format(utility_path, num_processors, r1_file, r2_file, sample_id, sample_id, sample_id, sample_id))
             
+
+def remove_mouse_dna(meta_sample, utility_path, num_processors=4):
+
+    # Given trimmed sequencing read fastq files
+    # DO: remove host (mouse) DNA reads
+
+    sample_list = meta_sample['sample_id'].to_list()
+
+    for sample_id in sample_list:
+        
+        r1_file = 'tmp/{}_R1_trimmed_paired.fastq'.format(sample_id)
+        r2_file = 'tmp/{}_R2_trimmed_paired.fastq'.format(sample_id)
+
+        # check f1 and f2 file
+        if os.path.isfile(r1_file) and os.path.isfile(r2_file):
+
+            # alignment trimmed reads to mouse genome
+            run_command('bowtie2 -x {}/Mus_musculus_GRCm38_Rel98_bowtie2_index/ref \
+                                    -1 tmp/{}_R1_trimmed_paired.fastq \
+                                    -2 tmp/{}_R2_trimmed_paired.fastq \
+                                    -p {} | \
+                         samtools view -bS > tmp/{}_mouseGenome_align.bam'.format(utility_path, sample_id, sample_id, num_processors, sample_id))
+            
+            # get mouse genome unmapped sam file
+            run_command('samtools view -b -f 4 -f 8 -o tmp/{}_mouseDNA_unmapped.bam tmp/{}_mouseGenome_align.bam'.format(sample_id, sample_id))
+
+            # sort unmapped bam file
+            run_command('samtools sort -n tmp/{}_mouseDNA_unmapped.bam -o tmp/{}_mouseDNA_unmapped_sorted.bam'.format(sample_id, sample_id))
+            
+            # extract unmapped reads from bam file
+            run_command('bamToFastq -i tmp/{}_mouseDNA_unmapped_sorted.bam \
+                                    -fq  tmp/{}_R1_trimmed_paired_mouseDNAremoved.fastq \
+                                    -fq2 tmp/{}_R2_trimmed_paired_mouseDNAremoved.fastq'.format(sample_id, sample_id, sample_id))
+
+            # clear bam files
+            run_command('rm tmp/{}_mouseGenome_align.bam'.format(sample_id))
+            run_command('rm tmp/{}_mouseDNA_unmapped.bam'.format(sample_id))
+            run_command('rm tmp/{}_mouseDNA_unmapped_sorted.bam'.format(sample_id))
+
+            # clear trimmed read files
+            run_command('rm tmp/{}_R1_trimmed_paired.fastq'.format(sample_id))
+            run_command('rm tmp/{}_R2_trimmed_paired.fastq'.format(sample_id))
+            run_command('rm tmp/{}_R1_trimmed_unpaired.fastq'.format(sample_id))
+            run_command('rm tmp/{}_R2_trimmed_unpaired.fastq'.format(sample_id))
+
+
+
 
 def rename_genome(genome_path, meta_genome):
     
@@ -96,7 +143,7 @@ def kallisto_index(genome_path):
 
 
 
-def kallisto_quant(genome_path, data_path, meta_sample, num_processors=4):
+def kallisto_quant(genome_path, meta_sample, num_processors=4):
     
     # Mapping reads to reference genomes using 'kallisto quant'
             
@@ -105,17 +152,17 @@ def kallisto_quant(genome_path, data_path, meta_sample, num_processors=4):
 
     for sample_id in sample_list:
         
-        r1_trimmed = data_path+'/{}_R1_trimmed_paired.fastq'.format(sample_id)
-        r2_trimmed = data_path+'/{}_R2_trimmed_paired.fastq'.format(sample_id)
+        r1_clean = 'tmp/{}_R1_trimmed_paired_mouseDNAremoved.fastq'.format(sample_id)
+        r2_clean = 'tmp/{}_R2_trimmed_paired_mouseDNAremoved.fastq'.format(sample_id)
         
         # check f1 and f2 file
-        if os.path.isfile(r1_trimmed) and os.path.isfile(r2_trimmed):
+        if os.path.isfile(r1_clean) and os.path.isfile(r2_clean):
             
             if not os.path.exists('tmp/kallisto_out_{}'.format(sample_id)):
                 run_command('mkdir tmp/kallisto_out_{}'.format(sample_id))
             
             # run kallisto
-            run_command('kallisto quant -i {} -o tmp/kallisto_out_{} {} {} -t {}'.format(genome_index, sample_id, r1_trimmed, r2_trimmed, num_processors))
+            run_command('kallisto quant -i {} -o tmp/kallisto_out_{} {} {} -t {}'.format(genome_index, sample_id, r1_clean, r2_clean, num_processors))
 
 
 
@@ -148,7 +195,7 @@ def merge_result(out_path, meta_sample):
     abundance_out.div(abundance_out.sum(axis=1), axis=0).to_csv(out_path+'/relative_abundance.csv', sep=',', index=True)
 
 
-def read_stats(out_path, data_path, meta_sample):
+def read_stats(out_path, meta_sample):
 
     sample_list = meta_sample['sample_id'].to_list()
 
@@ -158,7 +205,7 @@ def read_stats(out_path, data_path, meta_sample):
 
     for sample_id in sample_list:
         
-        sample_seqs = SeqIO.parse(data_path+'/{}_R1_trimmed_paired.fastq'.format(sample_id), 'fastq')
+        sample_seqs = SeqIO.parse('tmp/{}_R1_trimmed_paired_mouseDNAremoved.fastq'.format(sample_id), 'fastq')
         total_read = sum(1 for _ in sample_seqs)
         mapped_read = sum(mapped_read_count.loc[[sample_id]].transpose()[sample_id].to_list())
         mapped_rate = mapped_read/total_read
@@ -173,11 +220,10 @@ def read_stats(out_path, data_path, meta_sample):
 
 def main(args):
 
-    data_path = args.data_directory
-    genome_path = args.genome_reference_directory
     meta_sample_file = args.sample_metadata
     meta_genome_file = args.genome_metadata
-    trimmomatic_path = args.trimmomatic_directory
+    genome_path = args.genome_reference_directory
+    utility_path = args.utility_directory
     out_path = args.output_directory
     num_processors = args.processors
 
@@ -197,8 +243,13 @@ def main(args):
 
         # trim raw reads
         print('[{}] Start to trim raw reads using trimmomatic'.format(datetime.datetime.now()), file=log_file)
-        run_trimmomatic(data_path, meta_sample, trimmomatic_path, num_processors)
+        run_trimmomatic(meta_sample, utility_path, num_processors)
         print('[{}] Reads trimming done'.format(datetime.datetime.now()), file=log_file)
+
+        # remove hots DNA reads
+        print('[{}] Start to remove mouse DNA reads'.format(datetime.datetime.now()), file=log_file)
+        remove_mouse_dna(meta_sample, utility_path, num_processors)
+        print('[{}] Host reads removing done'.format(datetime.datetime.now()), file=log_file)
 
         # rename and merge reference genome fna files
         print('[{}] Rename contigs of reference genomes and concatenate into single fna file'.format(datetime.datetime.now()), file=log_file)
@@ -212,7 +263,7 @@ def main(args):
 
         # map reads to genome reference
         print('[{}] Start to quatify reads to reference genomes using kallisto quant'.format(datetime.datetime.now()), file=log_file)
-        kallisto_quant(genome_path, data_path, meta_sample, num_processors)
+        kallisto_quant(genome_path, meta_sample, num_processors)
         print('[{}] kallisto quant done'.format(datetime.datetime.now()), file=log_file)
 
         # merge kallisto map result
@@ -221,7 +272,7 @@ def main(args):
 
         # get reads mapping stats
         print('[{}] Start to quatify total and mapped reads in each sample'.format(datetime.datetime.now()), file=log_file)
-        read_stats(out_path, data_path, meta_sample)
+        read_stats(out_path, meta_sample)
         print('[{}] Reads stats done'.format(datetime.datetime.now()), file=log_file)
 
 
@@ -232,29 +283,30 @@ if __name__ == "__main__":
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     
-    parser.add_argument('-d', '--data_directory',
-                        help='directory path for raw sequencing reads fastq files',
-                        type=str,
-                        default='')
     parser.add_argument('-r', '--genome_reference_directory',
-                        help='directory path for reference genomes fna files',
+                        help='the directory path of reference genomes fna files',
                         type=str,
+                        required=True,
                         default='')
     parser.add_argument('-s', '--sample_metadata',
                         help='sample metadata .csv file',
                         type=str,
+                        required=True,
                         default='')
     parser.add_argument('-g', '--genome_metadata',
                         help='reference genome .csv file',
                         type=str,
+                        required=True,
                         default='')
     parser.add_argument('-o', '--output_directory',
-                        help='output directory',
+                        help='the directory path to store output files',
                         type=str,
+                        required=True,
                         default='')
-    parser.add_argument('-t', '--trimmomatic_directory',
-                        help='the directory path for trimmomatic-0.39.jar',
+    parser.add_argument('-u', '--utility_directory',
+                        help='the directory path of utility files',
                         type=str,
+                        required=True,
                         default='')
     parser.add_argument('-p', '--processors',
                         help='Number of CPU',
