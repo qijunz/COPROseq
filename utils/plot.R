@@ -13,9 +13,9 @@ setwd("/Volumes/ReyLab_QZ10T/COPROseq/test_BPB/")
 
 
 # load coproseq result
-mapped_reads <- fread("coproseq_out/mapped_read_count.csv") %>% as.data.frame()
-mapped_stats <- fread("coproseq_out/mapped_read_stats.csv") %>% as.data.frame()
-rel_abundance <- fread("coproseq_out/relative_abundance.csv") %>% as.data.frame()
+mapped_reads <- fread("coproseq_out/mapped_read_count.csv", data.table = F)
+mapped_stats <- fread("coproseq_out/mapped_read_stats.csv", data.table = F)
+rel_abundance <- fread("coproseq_out/relative_abundance.csv", data.table = F)
 
 # barplot
 p1 <- mapped_reads %>%
